@@ -61,6 +61,13 @@ public class Network implements Serializable {
                 }
             }
 
+            double trainMSE = totalError / trainData.length;
+            double testMSE = MSE(testData, testLabels);
+    
+            // Exibir progresso do treinamento
+            System.out.println("Iteration: " + iter + ", Train MSE: " + trainMSE + ", Test MSE: " + testMSE);
+    
+
             // Parar se o erro médio quadrático for menor que o limite
             if (totalError / trainData.length < minError) break;
 
@@ -108,4 +115,23 @@ public class Network implements Serializable {
             return (Network) ois.readObject();
         }
     }
+
+    private double MSE(double[][] data, int[] labels) {
+        double totalError = 0.0;
+        for (int i = 0; i < data.length; i++) {
+            // Forward pass para obter a saída contínua
+            double[] hiddenOutputs = new double[hiddenLayer.length];
+            for (int j = 0; j < hiddenLayer.length; j++) {
+                hiddenOutputs[j] = hiddenLayer[j].activation(data[i]);
+            }
+            double output = outputNeuron.activation(hiddenOutputs);
+    
+            // Calcular o erro com base na saída contínua
+            double error = labels[i] - output; // Comparar rótulo com saída contínua
+            totalError += error * error;
+        }
+        return totalError / data.length; // Retorna o MSE
+    }
+    
+    
 }

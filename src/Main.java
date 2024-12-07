@@ -10,15 +10,15 @@ public class Main {
 
         // Normalizar e dividir o dataset
         double[][] normalizedData = DataLoader.normalizeDataset(dataset);
-        Map<String, Object> split = DataLoader.splitDataset(normalizedData, labels, 0.5);
+        Map<String, Object> split = DataLoader.splitDataset(normalizedData, labels, 0.8);
         double[][] trainData = (double[][]) split.get("trainData");
         int[] trainLabels = (int[]) split.get("trainLabels");
         double[][] testData = (double[][]) split.get("testData");
         int[] testLabels = (int[]) split.get("testLabels");
 
         // Inicializar e treinar a rede
-        Network network = new Network(400, 10, 0.5);
-        network.train(trainData, trainLabels, testData, testLabels, 1000, 0.01);
+        Network network = new Network(400, 200, 0.2);
+        network.train(trainData, trainLabels, testData, testLabels, 500, 0.01);
 
         // Salvar a rede treinada
         NetworkUtils.saveNetwork(network, "Lab4/src/network.ser");

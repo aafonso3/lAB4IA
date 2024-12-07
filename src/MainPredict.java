@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class MainPredict {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        String networkPath = "src/network.ser";
+        String networkPath = "Lab4/src/network.ser";
 
     
         Scanner scanner = new Scanner(System.in);
@@ -18,6 +18,7 @@ public class MainPredict {
 
   
         double[] normalizedInput = DataLoader.normalizeInput(inputData);
+        System.out.println("tamanho do input "+normalizedInput.length);
 
         Network network = NetworkUtils.loadNetwork(networkPath);
 

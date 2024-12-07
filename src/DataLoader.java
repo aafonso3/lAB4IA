@@ -14,6 +14,7 @@ public class DataLoader {
                 dataset.add(data);
             }
         }
+    
         return dataset;
     }
 
@@ -28,24 +29,15 @@ public class DataLoader {
         return labels.stream().mapToInt(i -> i).toArray();
     }
 
+
     public static double[][] normalizeDataset(List<double[]> dataset) {
         double[][] normalizedData = new double[dataset.size()][];
-    
-        for (int row = 0; row < dataset.size(); row++) {
-            double[] currentRow = dataset.get(row);
-            normalizedData[row] = new double[currentRow.length];
-    
-            for (int i = 0; i < currentRow.length; i++) {
-                double val = currentRow[i];
-                if (val < 0) val = 0;           // Ajustar valores negativos para 0
-                if (val > 255) val = 255;       // Ajustar valores acima de 255 para 255
-                normalizedData[row][i] = val / 255.0; // Normalizar para [0, 1]
-            }
+        for (int i = 0; i < dataset.size(); i++) {
+            double[] row = dataset.get(i);
+            normalizedData[i] = Arrays.stream(row).map(x -> x / 255.0).toArray();
         }
-    
         return normalizedData;
     }
-    
 
 
     public static Map<String, Object> splitDataset(double[][] data, int[] labels, double trainRatio) {
