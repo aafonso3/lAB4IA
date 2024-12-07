@@ -5,8 +5,8 @@ import java.util.Map;
 public class Main {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         // Carregar dataset
-        List<double[]> dataset = DataLoader.loadDataset("Lab4/dataset/dataset.csv");
-        int[] labels = DataLoader.loadLabels("Lab4/dataset/labels.csv");
+        List<double[]> dataset = DataLoader.loadDataset("dataset/dataset.csv");
+        int[] labels = DataLoader.loadLabels("dataset/labels.csv");
 
         // Normalizar e dividir o dataset
         double[][] normalizedData = DataLoader.normalizeDataset(dataset);
@@ -17,11 +17,11 @@ public class Main {
         int[] testLabels = (int[]) split.get("testLabels");
 
         // Inicializar e treinar a rede
-        Network network = new Network(400, 200, 0.2);
-        network.train(trainData, trainLabels, testData, testLabels, 500, 0.01);
+        Network network = new Network(400, 100, 0.1);
+        network.train(trainData, trainLabels, testData, testLabels, 2000, 0.001);
 
         // Salvar a rede treinada
-        NetworkUtils.saveNetwork(network, "Lab4/src/network.ser");
+        NetworkUtils.saveNetwork(network, "src/network.ser");
 
         System.out.println("Rede neural treinada e salva em 'network.ser'");
     }

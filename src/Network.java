@@ -11,15 +11,27 @@ public class Network implements Serializable {
     public Network(int numInputs, int numHiddenNeurons, double learningRate) {
         this.learningRate = learningRate;
         Random rd = new Random();
-
-        // Inicializar os neurônios da camada oculta
+    
+        // Inicializar os neurônios da camada oculta com Xavier initialization
         hiddenLayer = new Neuron[numHiddenNeurons];
         for (int i = 0; i < numHiddenNeurons; i++) {
-            hiddenLayer[i] = new Neuron(new double[numInputs], rd.nextDouble());
+            double[] weights = new double[numInputs];
+            for (int j = 0; j < numInputs; j++) {
+                // Xavier initialization para pesos
+                weights[j] = rd.nextGaussian() * Math.sqrt(1.0 / numInputs);
+            }
+            double bias = rd.nextGaussian() * Math.sqrt(1.0 / numInputs); // Xavier initialization para bias
+            hiddenLayer[i] = new Neuron(weights, bias);
         }
-
-        // Inicializar o neurônio de saída
-        outputNeuron = new Neuron(new double[numHiddenNeurons], rd.nextDouble());
+    
+        // Inicializar o neurônio de saída com Xavier initialization
+        double[] outputWeights = new double[numHiddenNeurons];
+        for (int j = 0; j < numHiddenNeurons; j++) {
+            // Xavier initialization para pesos
+            outputWeights[j] = rd.nextGaussian() * Math.sqrt(1.0 / numHiddenNeurons);
+        }
+        double outputBias = rd.nextGaussian() * Math.sqrt(1.0 / numHiddenNeurons); // Xavier initialization para bias
+        outputNeuron = new Neuron(outputWeights, outputBias);
     }
 
     // Método para treinar a rede neural
@@ -28,14 +40,14 @@ public class Network implements Serializable {
             double totalError = 0;
 
             for (int i = 0; i < trainData.length; i++) {
-                // Forward pass
+        
                 double[] hiddenOutputs = new double[hiddenLayer.length];
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     hiddenOutputs[j] = hiddenLayer[j].activation(trainData[i]);
                 }
                 double output = outputNeuron.activation(hiddenOutputs);
 
-                // Calcular o erro
+            
                 double error = trainLabels[i] - output;
                 totalError += error * error;
 
@@ -46,13 +58,13 @@ public class Network implements Serializable {
                     hiddenDeltas[j] = outputDelta * outputNeuron.weights[j] * hiddenOutputs[j] * (1 - hiddenOutputs[j]);
                 }
 
-                // Atualizar os pesos da camada de saída
+      
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     outputNeuron.weights[j] += learningRate * outputDelta * hiddenOutputs[j];
                 }
                 outputNeuron.bias += learningRate * outputDelta;
 
-                // Atualizar os pesos da camada oculta
+             
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     for (int k = 0; k < hiddenLayer[j].weights.length; k++) {
                         hiddenLayer[j].weights[k] += learningRate * hiddenDeltas[j] * trainData[i][k];
@@ -119,18 +131,18 @@ public class Network implements Serializable {
     private double MSE(double[][] data, int[] labels) {
         double totalError = 0.0;
         for (int i = 0; i < data.length; i++) {
-            // Forward pass para obter a saída contínua
+     
             double[] hiddenOutputs = new double[hiddenLayer.length];
             for (int j = 0; j < hiddenLayer.length; j++) {
                 hiddenOutputs[j] = hiddenLayer[j].activation(data[i]);
             }
             double output = outputNeuron.activation(hiddenOutputs);
     
-            // Calcular o erro com base na saída contínua
-            double error = labels[i] - output; // Comparar rótulo com saída contínua
+      
+            double error = labels[i] - output; 
             totalError += error * error;
         }
-        return totalError / data.length; // Retorna o MSE
+        return totalError / data.length; 
     }
     
     

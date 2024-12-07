@@ -34,10 +34,18 @@ public class DataLoader {
         double[][] normalizedData = new double[dataset.size()][];
         for (int i = 0; i < dataset.size(); i++) {
             double[] row = dataset.get(i);
-            normalizedData[i] = Arrays.stream(row).map(x -> x / 255.0).toArray();
+            normalizedData[i] = Arrays.stream(row)
+                                      .map(x -> {
+                                          if (x <= 0) return 0;    
+                                          if (x >= 255) return 1;  
+                                          return x / 255.0;       
+                                      })
+                                      .toArray();
         }
         return normalizedData;
     }
+    
+    
 
 
     public static Map<String, Object> splitDataset(double[][] data, int[] labels, double trainRatio) {
@@ -69,8 +77,17 @@ public class DataLoader {
             }
         }
     
-        // Método para normalizar um único input
+
         public static double[] normalizeInput(double[] inputData) {
-            return Arrays.stream(inputData).map(x -> x / 255.0).toArray();
+            return Arrays.stream(inputData)
+                         .map(x -> {
+                             if (x <= 0) return 0;    
+                             if (x >= 255) return 1;  
+                             return x / 255.0;       
+                         })
+                         .toArray();
         }
+        
+
+
 }

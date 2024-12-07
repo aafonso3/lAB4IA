@@ -1,13 +1,15 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 public class MainPredictTest {
 
     @Test
     public void testMultipleInputsPrediction() throws Exception {
         // Caminho para o arquivo da rede serializada
-        String networkPath = "Lab4/src/network.ser";
+        String networkPath = "src/network.ser";
 
         // Simular múltiplos inputs (10 linhas de valores separados por vírgula)
         String[] simulatedInputs = {
@@ -38,29 +40,38 @@ public class MainPredictTest {
 
         // Carregar a rede neural treinada
         Network network = NetworkUtils.loadNetwork(networkPath);
+  // Armazenar erros acumulados
+  List<String> errors = new ArrayList<>();
 
-        // Processar cada input
-        for (int i = 0; i < simulatedInputs.length; i++) {
-            try {
-                // Converter os valores para double[]
-                String[] values = simulatedInputs[i].split(",");
-                double[] inputData = Arrays.stream(values).mapToDouble(Double::parseDouble).toArray();
+  // Processar cada input
+  for (int i = 0; i < simulatedInputs.length; i++) {
+      try {
+          // Converter os valores para double[]
+          String[] values = simulatedInputs[i].split(",");
+          double[] inputData = Arrays.stream(values).mapToDouble(Double::parseDouble).toArray();
 
-                // Normalizar o input
-                double[] normalizedInput = DataLoader.normalizeInput(inputData);
+          // Normalizar o input
+          double[] normalizedInput = DataLoader.normalizeInput(inputData);
 
-                // Fazer a predição
-                int predictedLabel = network.predict(normalizedInput);
+          // Fazer a predição
+          int predictedLabel = network.predict(normalizedInput);
 
-                // Logar a predição
-                System.out.println("Input " + (i + 1) + ": Predição = " + predictedLabel + ", Esperado = " + expectedResults[i]);
+          // Logar a predição
+          System.out.println("Input " + (i + 1) + ": Predição = " + predictedLabel + ", Esperado = " + expectedResults[i]);
 
-                // Verificar a predição
-                assertEquals("Predição incorreta para o input " + (i + 1), expectedResults[i], predictedLabel);
+          // Verificar a predição
+          if (predictedLabel != expectedResults[i]) {
+              errors.add("Input " + (i + 1) + ": Predição = " + predictedLabel + ", Esperado = " + expectedResults[i]);
+          }
 
-            } catch (Exception e) {
-                fail("Erro ao processar o input " + (i + 1) + ": " + e.getMessage());
-            }
-        }
-    }
+      } catch (Exception e) {
+          errors.add("Erro ao processar o input " + (i + 1) + ": " + e.getMessage());
+      }
+  }
+
+  // Reportar resultados ao final
+  if (!errors.isEmpty()) {
+      fail("Erros detectados: \n" + String.join("\n", errors));
+  }
+}
 }

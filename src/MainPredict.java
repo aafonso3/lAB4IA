@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class MainPredict {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        String networkPath = "Lab4/src/network.ser";
+        String networkPath = "src/network.ser";
 
     
         Scanner scanner = new Scanner(System.in);
