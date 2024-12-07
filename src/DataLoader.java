@@ -28,15 +28,24 @@ public class DataLoader {
         return labels.stream().mapToInt(i -> i).toArray();
     }
 
-
     public static double[][] normalizeDataset(List<double[]> dataset) {
         double[][] normalizedData = new double[dataset.size()][];
-        for (int i = 0; i < dataset.size(); i++) {
-            double[] row = dataset.get(i);
-            normalizedData[i] = Arrays.stream(row).map(x -> x / 255.0).toArray();
+    
+        for (int row = 0; row < dataset.size(); row++) {
+            double[] currentRow = dataset.get(row);
+            normalizedData[row] = new double[currentRow.length];
+    
+            for (int i = 0; i < currentRow.length; i++) {
+                double val = currentRow[i];
+                if (val < 0) val = 0;           // Ajustar valores negativos para 0
+                if (val > 255) val = 255;       // Ajustar valores acima de 255 para 255
+                normalizedData[row][i] = val / 255.0; // Normalizar para [0, 1]
+            }
         }
+    
         return normalizedData;
     }
+    
 
 
     public static Map<String, Object> splitDataset(double[][] data, int[] labels, double trainRatio) {
@@ -54,4 +63,22 @@ public class DataLoader {
 
         return split;
     }
+
+
+        // Método para carregar um único input
+        public static double[] loadSingleInput(String filePath) throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                String line = br.readLine();
+                if (line == null || line.isEmpty()) {
+                    throw new IOException("Input file is empty or invalid");
+                }
+                String[] values = line.split(",");
+                return Arrays.stream(values).mapToDouble(Double::parseDouble).toArray();
+            }
+        }
+    
+        // Método para normalizar um único input
+        public static double[] normalizeInput(double[] inputData) {
+            return Arrays.stream(inputData).map(x -> x / 255.0).toArray();
+        }
 }

@@ -1,4 +1,8 @@
-public class Neuron {
+import java.io.Serializable;
+
+public class Neuron implements Serializable {
+    private static final long serialVersionUID = 1L; 
+
     double[] weights;
     double bias;
 
@@ -19,7 +23,7 @@ public class Neuron {
         return 1.0 / (1.0 + Math.exp(-z));
     }
 
-    public double activation(double[] inputs, int dummy) {
+    public double activation(double[] inputs) {
         return sigmoid(weightSum(inputs));
     }
 }

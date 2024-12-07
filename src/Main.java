@@ -3,32 +3,26 @@ import java.util.List;
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-  
-        List<double[]> dataset = DataLoader.loadDataset("dataset/dataset.csv");
-        int[] labels = DataLoader.loadLabels("dataset/labels.csv");
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        // Carregar dataset
+        List<double[]> dataset = DataLoader.loadDataset("Lab4/dataset/dataset.csv");
+        int[] labels = DataLoader.loadLabels("Lab4/dataset/labels.csv");
 
-   
+        // Normalizar e dividir o dataset
         double[][] normalizedData = DataLoader.normalizeDataset(dataset);
-
-    
-        Map<String, Object> split = DataLoader.splitDataset(normalizedData, labels, 0.8);
+        Map<String, Object> split = DataLoader.splitDataset(normalizedData, labels, 0.5);
         double[][] trainData = (double[][]) split.get("trainData");
         int[] trainLabels = (int[]) split.get("trainLabels");
         double[][] testData = (double[][]) split.get("testData");
         int[] testLabels = (int[]) split.get("testLabels");
 
-  
-        Network network = new Network(400, 1, 0.9); 
-
- 
+        // Inicializar e treinar a rede
+        Network network = new Network(400, 10, 0.5);
         network.train(trainData, trainLabels, testData, testLabels, 1000, 0.01);
 
-        int[] output = network.test(testData);
+        // Salvar a rede treinada
+        NetworkUtils.saveNetwork(network, "Lab4/src/network.ser");
 
-      
-        for (int i = 0; i < output.length; i++) {
-            System.out.println("Expected: " + testLabels[i] + ", Predicted: " + output[i]);
-        }
+        System.out.println("Rede neural treinada e salva em 'network.ser'");
     }
 }

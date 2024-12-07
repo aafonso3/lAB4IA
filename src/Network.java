@@ -1,50 +1,58 @@
+import java.io.*;
 import java.util.Random;
 
-public class Network {
-    Neuron[] hiddenLayer;
-    Neuron outputNeuron;
-    private final double learningRate;
+public class Network implements Serializable {
+    private static final long serialVersionUID = 1L; // Identificador para serialização
+
+    Neuron[] hiddenLayer; // Camada oculta com múltiplos neurônios
+    Neuron outputNeuron; // Neurônio da camada de saída
+    private final double learningRate; // Taxa de aprendizado
 
     public Network(int numInputs, int numHiddenNeurons, double learningRate) {
         this.learningRate = learningRate;
         Random rd = new Random();
 
+        // Inicializar os neurônios da camada oculta
         hiddenLayer = new Neuron[numHiddenNeurons];
         for (int i = 0; i < numHiddenNeurons; i++) {
             hiddenLayer[i] = new Neuron(new double[numInputs], rd.nextDouble());
         }
 
- 
+        // Inicializar o neurônio de saída
         outputNeuron = new Neuron(new double[numHiddenNeurons], rd.nextDouble());
     }
 
+    // Método para treinar a rede neural
     public void train(double[][] trainData, int[] trainLabels, double[][] testData, int[] testLabels, int maxIterations, double minError) {
         for (int iter = 0; iter < maxIterations; iter++) {
             double totalError = 0;
 
             for (int i = 0; i < trainData.length; i++) {
-      
+                // Forward pass
                 double[] hiddenOutputs = new double[hiddenLayer.length];
                 for (int j = 0; j < hiddenLayer.length; j++) {
-                    hiddenOutputs[j] = hiddenLayer[j].activation(trainData[i], 0);
+                    hiddenOutputs[j] = hiddenLayer[j].activation(trainData[i]);
                 }
-                double output = outputNeuron.activation(hiddenOutputs, 0);
+                double output = outputNeuron.activation(hiddenOutputs);
 
+                // Calcular o erro
                 double error = trainLabels[i] - output;
                 totalError += error * error;
 
+                // Backpropagation
                 double outputDelta = error * output * (1 - output);
                 double[] hiddenDeltas = new double[hiddenLayer.length];
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     hiddenDeltas[j] = outputDelta * outputNeuron.weights[j] * hiddenOutputs[j] * (1 - hiddenOutputs[j]);
                 }
 
-            
+                // Atualizar os pesos da camada de saída
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     outputNeuron.weights[j] += learningRate * outputDelta * hiddenOutputs[j];
                 }
                 outputNeuron.bias += learningRate * outputDelta;
 
+                // Atualizar os pesos da camada oculta
                 for (int j = 0; j < hiddenLayer.length; j++) {
                     for (int k = 0; k < hiddenLayer[j].weights.length; k++) {
                         hiddenLayer[j].weights[k] += learningRate * hiddenDeltas[j] * trainData[i][k];
@@ -53,26 +61,51 @@ public class Network {
                 }
             }
 
-     
+            // Parar se o erro médio quadrático for menor que o limite
             if (totalError / trainData.length < minError) break;
 
-    
+            // Opcional: Mostrar progresso do erro
             System.out.println("Iteration: " + iter + ", Error: " + (totalError / trainData.length));
         }
     }
 
+    // Método para testar a rede neural
     public int[] test(double[][] testData) {
         int[] predictions = new int[testData.length];
 
         for (int i = 0; i < testData.length; i++) {
             double[] hiddenOutputs = new double[hiddenLayer.length];
             for (int j = 0; j < hiddenLayer.length; j++) {
-                hiddenOutputs[j] = hiddenLayer[j].activation(testData[i], 0);
+                hiddenOutputs[j] = hiddenLayer[j].activation(testData[i]);
             }
-            double output = outputNeuron.activation(hiddenOutputs, 0);
+            double output = outputNeuron.activation(hiddenOutputs);
             predictions[i] = output >= 0.5 ? 1 : 0;
         }
 
         return predictions;
+    }
+
+    // Método para fazer uma predição com um único input
+    public int predict(double[] inputData) {
+        double[] hiddenOutputs = new double[hiddenLayer.length];
+        for (int i = 0; i < hiddenLayer.length; i++) {
+            hiddenOutputs[i] = hiddenLayer[i].activation(inputData);
+        }
+        double output = outputNeuron.activation(hiddenOutputs);
+        return output >= 0.5 ? 1 : 0; // Classificação binária
+    }
+
+    // Método para salvar a rede neural em um arquivo
+    public void saveNetwork(String filePath) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(this);
+        }
+    }
+
+    // Método para carregar a rede neural de um arquivo
+    public static Network loadNetwork(String filePath) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+            return (Network) ois.readObject();
+        }
     }
 }
