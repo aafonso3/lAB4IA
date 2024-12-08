@@ -16,8 +16,8 @@ public class Main {
         int[] testLabels = (int[]) split.get("testLabels");
 
 
-        Network network = new Network(400, 10, 0.05);
-        network.train(trainData, trainLabels, testData, testLabels,  50000,  1e-4,0);
+        Network network = new Network(400, 5, 0.05);
+        network.train(trainData, trainLabels, testData, testLabels,  50000,  1e-4,0.5);
 
 
         int[] predictions = network.test(testData);
@@ -27,7 +27,6 @@ public class Main {
      
         NetworkUtils.saveNetwork(network, "src/network.ser");
 
-        //System.out.println("Rede neural treinada e salva em 'network.ser'");
     }
 
     public static void calculateAccuracy(int[] predictions, int[] actualLabels) {
