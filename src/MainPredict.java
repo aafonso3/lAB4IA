@@ -18,7 +18,7 @@ public class MainPredict {
 
   
         double[] normalizedInput = DataLoader.normalizeInput(inputData);
-        System.out.println("tamanho do input "+normalizedInput.length);
+        //System.out.println("tamanho do input "+normalizedInput.length);
 
         Network network = NetworkUtils.loadNetwork(networkPath);
 
